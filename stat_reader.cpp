@@ -13,11 +13,11 @@ RequestDescription ParseRequestDescription(std::string_view line) {
             std::string(line.substr(space_pos + 1))};
 }
 
-void ParseAndPrintStat(const TransportCatalogue& tansport_catalogue, std::string_view request,
+void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::string_view request,
                        std::ostream& output) {
     auto request_description = ParseRequestDescription(request);
     if (request_description.command == "Bus") {
-        auto bus_info = tansport_catalogue.GetBusInfo(request_description.id);
+        auto bus_info = transport_catalogue.GetBusInfo(request_description.id);
         if (bus_info.route.empty()) {
             output << "Bus " << request_description.id << ": not found\n";
             return;

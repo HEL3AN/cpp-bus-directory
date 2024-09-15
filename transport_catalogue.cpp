@@ -1,23 +1,12 @@
 #include "transport_catalogue.h"
 
 void TransportCatalogue::AddStop(std::string_view name, Coordinates coordinates) {
-    stops_.push_back({move(name), coordinates}); //изменить name
+    stops_.emplace_back(Stop{std::string(name), coordinates});
+    //stops_.push_back({move(std::string(name.data(), name.size())), coordinates});
     stopname_to_stop_[name] = &stops_.back();
 }
 
 void TransportCatalogue::AddBus(std::string_view name, std::vector<std::string_view> route) {
-    // route
-    std::vector<Stop*> route_stops;
-    for (auto stop_name : route) {
-        auto stop = stopname_to_stop_.find(stop_name);
-        if (stop == stopname_to_stop_.end()) {
-            stopname_to_stop_[stop_name] = &stops_.back();
-            route_stops.push_back(&stops_.back());
-        } else {
-            route_stops.push_back(stop->second);
-        }
-    }
-
     // route_length
     double route_length = 0;
     for (auto it = route.begin() + 1; it != route.end(); ++it) {
@@ -26,8 +15,12 @@ void TransportCatalogue::AddBus(std::string_view name, std::vector<std::string_v
         route_length += ComputeDistance(stop->second->coordinates, (prev_stop)->second->coordinates);
     }
 
-    buses_.push_back({move(name), move(route_stops), route_length}); //изменить name
-    busname_to_bus_[name] = &buses_.back();
+    buses_.emplace_back(Bus{std::string(name), {}, route_length});
+    for (const auto& stop_name : route) {
+        // Добавляем указатели на остановки в маршрут
+        buses_.back().route.push_back(stopname_to_stop_.at(std::string(stop_name)));
+    }
+    busname_to_bus_[buses_.back().name] = &buses_.back();
 }
 
 Bus TransportCatalogue::GetBusInfo(std::string_view name) const {

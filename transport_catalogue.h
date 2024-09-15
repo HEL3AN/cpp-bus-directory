@@ -6,12 +6,12 @@
 #include "geo.h"
 
 struct Stop {
-	std::string_view name;
+	std::string name;
 	Coordinates coordinates;
 };
 
 struct Bus {
-	std::string_view name;
+	std::string name;
 	std::vector<Stop*> route;
 	double route_length;
 };
